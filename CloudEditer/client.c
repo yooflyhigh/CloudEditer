@@ -31,13 +31,50 @@ int main(int argc,char *argv[]){
 		exit(1);
 	}
 	/* 서버와 통신합니다. */
+	system("clear");
+	printf("안녕하세요. SP TermProject에 오신걸 환영합니다. \n 'help'를 입력하여 명령어를 확인하세요.\n\n");
 	while(1){
+		/* 명령어 입력 */
+		printf("(%d)/home$",getpid());
 		gets(msg);
+		/* 서버로 명령어 전송 */
 		write(client_socket, msg, strlen(msg)+1);
-		if(!strcmp(msg,"exit") || !strcmp(msg,"EXIT")){
+		/* help  */
+		if(!strcmp(msg,"help")){
+			system("clear");
+			printf("'help' 명령어를 출력합니다.\n");
+			printf("'whoami' 접속하신 프로세스의 id를 출력합니다.");
+			printf("'clear' 화면을 지워줍니다.\n");
+			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
+			printf("'파일이름' 해당 파일을 오픈합니다.\n");
+			printf("'exit' 연결을 종료합니다.\n\n");
+		}
+		/* pid 출력 */
+		else if(!strcmp(msg,"whoami")){
+			printf("접속하신 계정의 id는 (%d) 입니다.\n",getpid());
+		}
+		/* 화면 clear */
+		else if(!strcmp(msg,"clear")){
+			system("clear");
+		}
+		/* 파일 목록 출력 */
+		else if(!strcmp(msg,"ls")){
+			printf("구현중 입니다.\n");
+		}
+		/* 파일 실행 */
+		else if(!strcmp(msg,"파일이름")){
+			printf("구현중 입니다.\n");
+		}
+		/* 종료 */
+		else if(!strcmp(msg,"exit") || !strcmp(msg,"EXIT")){
 			close(client_socket);
 			break;
 		}
+		else{
+			printf("그런 명령어는 없습니다.\n");
+		}
+
+		/* 서버로 부터 메시지 받음 */
 		read(client_socket, msg, BUF);
 		printf("client say : i receved [%s]\n",msg);
 	}

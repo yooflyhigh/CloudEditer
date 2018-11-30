@@ -59,22 +59,39 @@ int main(int argc,char *argv[]){
 			exit(1);
 		}
 		pid = fork();
-
 		/* 자식 프로세스이면 메시지를 계속 주고받고 exit오면 종료 */
 		if(pid == 0){
 			while(1){	
+				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
-				if(!strcmp(Msgrcv,"exit") || !strcmp(Msgrcv,"EXIT")){
-					printf("server say : exit를 누르셨습니다. 종료합니다.");
-					exit(0);
+				/* help  */
+				if(!strcmp(Msgrcv,"help")){
 				}
-				sprintf(Msgsnd, "server say : %ld : %s", strlen(Msgrcv),Msgrcv);
+				/* pid 출력 */
+				else if(!strcmp(Msgrcv,"whoami")){
+				}
+				/* 화면 clear */
+				else if(!strcmp(Msgrcv,"clear")){
+				}
+				/* 파일 목록 출력 */
+				else if(!strcmp(Msgrcv,"ls")){
+				}
+				/* 파일 실행 */
+				else if(!strcmp(Msgrcv,"파일이름")){
+				}
+				/* 종료 */
+				else if(!strcmp(Msgrcv,"exit") || !strcmp(Msgrcv,"EXIT")){
+				}
+				else{
+				}
+
+				/*클라이언트에게 메시지 보내기 */
+				sprintf(Msgsnd, "server say : %s", Msgrcv);
 				write(client_socket, Msgsnd, strlen(Msgsnd)+1);
 			}
 		}
 		/* 부모 프로세스이면 포크 떠주고 다시 기다림 */
 		else if(pid > 0){
-				printf("프로세스[%d]가 할당되었습니다.\n",pid);
 				close(client_socket);
 		}
 		else{
@@ -84,4 +101,3 @@ int main(int argc,char *argv[]){
 	}
 	return 0;
 }
-
