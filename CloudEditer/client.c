@@ -43,7 +43,7 @@ int main(int argc,char *argv[]){
 		if(!strcmp(msg,"help")){
 			system("clear");
 			printf("'help' 명령어를 출력합니다.\n");
-			printf("'whoami' 접속하신 프로세스의 id를 출력합니다.");
+			printf("'whoami' 접속하신 프로세스의 id를 출력합니다.\n");
 			printf("'clear' 화면을 지워줍니다.\n");
 			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
 			printf("'파일이름' 해당 파일을 오픈합니다.\n");

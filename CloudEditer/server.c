@@ -9,7 +9,6 @@
 #include <wait.h>
 #include <signal.h>
 
-
 #define BUF 1024
 int main(int argc,char *argv[]){
 	int server_socket, client_socket, client_addr_size;
