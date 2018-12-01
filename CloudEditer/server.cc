@@ -1,5 +1,6 @@
 /* 서버 */
-#include <stdio.h>
+#include <iostream>
+#include <string>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
@@ -8,17 +9,33 @@
 #include <sys/socket.h>
 #include <wait.h>
 #include <signal.h>
+#include <dirent.h>
+#include <vector>
+using namespace std;
 
 #define BUF 1024
+#define TRUE 1
+
+struct Filelist{
+	vector<string> v;
+};
 int main(int argc,char *argv[]){
-	int server_socket, client_socket, client_addr_size;
+	/* 프로세스 관련 변수 */
 	int pid;
+	/* 소켓 관련 변수 */
+	int server_socket, client_socket, client_addr_size;
 	struct sockaddr_in server_addr, client_addr;
+	/* 헨들러 관련 변수 */
 	struct sigaction sa;
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = 0;
+	/* 디렉토리 관련 변수 */
+	DIR *Userdir;
+	struct dirent* entry = NULL;
+	/* 메시지 관련 변수 */
 	char Msgrcv[BUF];
 	char Msgsnd[BUF];
+	Filelist ls;
 
 	/* signal을 child가 죽어도 시그널을 무시로 해놓는다. */
 	sigaction(SIGCHLD, &sa, NULL);
@@ -48,11 +65,11 @@ int main(int argc,char *argv[]){
 			exit(1);
 	}
 	/* 서버는 클라이언트의 요청이 올때까지 listen상태에 머무르며 무한히 반복합니다. */
-	while(1){
+	while(TRUE){
 		/* 클라이언트를 기다림 */
 		waitpid(pid,NULL,WNOHANG);
 		client_addr_size = sizeof(client_addr);
-		client_socket = accept(server_socket, (struct sockaddr*)&client_addr, &client_addr_size);
+		client_socket = accept(server_socket, (sockaddr*)&client_addr, (socklen_t*)&client_addr_size);
 		if( -1 == client_socket){
 			printf("클라이언트 연결 수락 실패\n");
 			exit(1);
@@ -60,28 +77,29 @@ int main(int argc,char *argv[]){
 		pid = fork();
 		/* 자식 프로세스이면 메시지를 계속 주고받고 exit오면 종료 */
 		if(pid == 0){
-			while(1){	
+			/* 클라이언트 디렉토리로 이동 */
+			if((Userdir = opendir("../ClientFolder")) == NULL){
+				printf("Dir open error\n");
+				exit(0);
+			}
+			while(TRUE){	
 				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
-				/* help  */
-				if(!strcmp(Msgrcv,"help")){
-				}
-				/* pid 출력 */
-				else if(!strcmp(Msgrcv,"whoami")){
-				}
-				/* 화면 clear */
-				else if(!strcmp(Msgrcv,"clear")){
-				}
 				/* 파일 목록 출력 */
-				else if(!strcmp(Msgrcv,"ls")){
+				if(!strcmp(Msgrcv,"ls")){
+					int i=0;
+					while((entry = readdir(Userdir)) != NULL){
+						ls.v.push_back(entry->d_name);
+					}
+					write(client_socket, &ls, sizeof(Filelist));
 				}
 				/* 파일 실행 */
-				else if(!strcmp(Msgrcv,"파일이름")){
+				else if(!strcmp(Msgrcv, "파일이름")){
 				}
+
 				/* 종료 */
-				else if(!strcmp(Msgrcv,"exit") || !strcmp(Msgrcv,"EXIT")){
-				}
-				else{
+				else if(!strcmp(Msgrcv, "exit") || !strcmp(Msgrcv, "EXIT")){
+					closedir(Userdir);
 				}
 
 				/*클라이언트에게 메시지 보내기 */

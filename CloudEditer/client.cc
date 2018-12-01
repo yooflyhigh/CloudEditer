@@ -1,17 +1,28 @@
 /* 클라이언트 */
-#include <stdio.h>
+#include <iostream>
+#include <string>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <sys/types.h>
 #include <sys/socket.h>
+#include <vector>
+using namespace std;
 
 #define BUF 1024
+
+struct Filelist{
+	vector<string> v;
+};
 int main(int argc,char *argv[]){
+	/* 소켓 관련 변수 */
 	int client_socket;
 	struct sockaddr_in server_addr;
+	/* 메시지 관련 변수 */
 	char msg[BUF];
+	Filelist ls;
+	ls.v.reserve(10);
 
 	/* 네트워크 통신을 위한  TCP 소켓 생성 */
 	client_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -36,7 +47,7 @@ int main(int argc,char *argv[]){
 	while(1){
 		/* 명령어 입력 */
 		printf("(%d)/home$",getpid());
-		gets(msg);
+		cin >> msg;
 		/* 서버로 명령어 전송 */
 		write(client_socket, msg, strlen(msg)+1);
 		/* help  */
@@ -59,7 +70,11 @@ int main(int argc,char *argv[]){
 		}
 		/* 파일 목록 출력 */
 		else if(!strcmp(msg,"ls")){
-			printf("구현중 입니다.\n");
+			sleep(1);
+			read(client_socket, &ls, sizeof(ls));
+			for(int i = 0; i < ls.v.size(); i++){
+				cout << ls.v[i] << endl;
+			}
 		}
 		/* 파일 실행 */
 		else if(!strcmp(msg,"파일이름")){
@@ -72,6 +87,7 @@ int main(int argc,char *argv[]){
 		}
 		else{
 			printf("그런 명령어는 없습니다.\n");
+			continue;
 		}
 
 		/* 서버로 부터 메시지 받음 */
