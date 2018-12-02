@@ -101,6 +101,7 @@ int main(int argc,char *argv[]){
 				/* 종료 */
 				else if(!strcmp(Msgrcv, "exit") || !strcmp(Msgrcv, "EXIT")){
 					closedir(Userdir);
+					exit(0);
 				}
 
 				/*클라이언트에게 메시지 보내기 */

@@ -11,7 +11,7 @@
 using namespace std;
 
 #define BUF 1024
-
+#define TRUE 1
 struct Filelist{
 	vector<string> v;
 };
@@ -46,7 +46,7 @@ int main(int argc,char *argv[]){
 	while(1){
 		/* 명령어 입력 */
 		printf("(%d)/home$",getpid());
-		cin >> msg;
+		cin.getline(msg,1000,'\n');
 		/* 서버로 명령어 전송 */
 		write(client_socket, msg, strlen(msg)+1);
 		/* help  */
@@ -85,9 +85,6 @@ int main(int argc,char *argv[]){
 		else if(!strcmp(msg,"exit") || !strcmp(msg,"EXIT")){
 			close(client_socket);
 			break;
-		}
-		else if(!strcmp(msg,"\n")){
-			continue;
 		}
 		else{
 			printf("그런 명령어는 없습니다.\n");
