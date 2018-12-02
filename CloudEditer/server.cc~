@@ -77,22 +77,23 @@ int main(int argc,char *argv[]){
 		pid = fork();
 		/* 자식 프로세스이면 메시지를 계속 주고받고 exit오면 종료 */
 		if(pid == 0){
+			/* 클라이언트 디렉토리로 이동 */
+			if((Userdir = opendir("../ClientFolder")) == NULL){
+				printf("Dir open error\n");
+				exit(0);
+			}
 			while(TRUE){	
-				/* 클라이언트 디렉토리로 이동 */
-				if((Userdir = opendir("../ClientFolder")) == NULL){
-					printf("Dir open error\n");
-					exit(0);
-				}
 				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
 				/* 파일 목록 쓰기 */
 				if(!strcmp(Msgrcv,"ls")){
+					int i=0;
 					while((entry = readdir(Userdir)) != NULL){
 						ls.v.push_back(entry->d_name);
-						write(client_socket, entry->d_name, 10);
 						sleep(0.5);
+						write(client_socket, entry->d_name, strlen(entry->d_name)+1);
+				//		printf("\nserver : %s \n",ls.v[i++]);
 					}
-					write(client_socket, "0", 10);
 				}
 				/* 파일 실행 */
 				else if(!strcmp(Msgrcv, "파일이름")){
@@ -104,8 +105,8 @@ int main(int argc,char *argv[]){
 				}
 
 				/*클라이언트에게 메시지 보내기 */
-	//			sprintf(Msgsnd, "server say : %s", Msgrcv);
-	//			write(client_socket, Msgsnd, strlen(Msgsnd)+1);
+				sprintf(Msgsnd, "server say : %s", Msgrcv);
+				write(client_socket, Msgsnd, strlen(Msgsnd)+1);
 			}
 		}
 		/* 부모 프로세스이면 포크 떠주고 다시 기다림 */

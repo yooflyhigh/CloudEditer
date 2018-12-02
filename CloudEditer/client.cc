@@ -22,7 +22,6 @@ int main(int argc,char *argv[]){
 	/* 메시지 관련 변수 */
 	char msg[BUF];
 	Filelist ls;
-	ls.v.reserve(10);
 
 	/* 네트워크 통신을 위한  TCP 소켓 생성 */
 	client_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -70,11 +69,13 @@ int main(int argc,char *argv[]){
 		}
 		/* 파일 목록 출력 */
 		else if(!strcmp(msg,"ls")){
-			sleep(1);
-			read(client_socket, &ls, sizeof(ls));
-			for(int i = 0; i < ls.v.size(); i++){
-				cout << ls.v[i] << endl;
+			char end[10];
+			while(1){
+				read(client_socket, end, 10);
+				if(end[0] == '0')	break;
+				printf("%s\n",end);
 			}
+			printf("\n");
 		}
 		/* 파일 실행 */
 		else if(!strcmp(msg,"파일이름")){
@@ -85,17 +86,19 @@ int main(int argc,char *argv[]){
 			close(client_socket);
 			break;
 		}
+		else if(!strcmp(msg,"\n")){
+			continue;
+		}
 		else{
 			printf("그런 명령어는 없습니다.\n");
 			continue;
 		}
 
 		/* 서버로 부터 메시지 받음 */
-		read(client_socket, msg, BUF);
-		printf("client say : i receved [%s]\n",msg);
+	//	read(client_socket, msg, BUF);
+	//	printf("client say : i receved [%s]\n",msg);
 	}
 	/* 소켓 종료 */
 	close(client_socket);
 	return 0;
 }
-
