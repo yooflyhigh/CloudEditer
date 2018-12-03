@@ -45,8 +45,7 @@ int main(int argc,char *argv[]){
 		read(client_socket, path, BUF);	
 		/* 명령어 입력 */
 		printf("(%d)%s$ ",getpid(),path);
-		cin.getline(msg,1000,'\n');
-
+		cin.getline(msg, 1000,'\n');
 		/* 서버로 명령어 전송 */
 		write(client_socket, msg, strlen(msg)+1);
 		/* help  */
@@ -72,7 +71,7 @@ int main(int argc,char *argv[]){
 		else if(!strcmp(msg,"ls")){
 			char end[10];
 			while(1){
-				read(client_socket, end, 10);
+				read(client_socket, end, BUF);
 				if(end[0] == '0')	break;
 				printf("%s\n",end);
 			}
@@ -81,8 +80,8 @@ int main(int argc,char *argv[]){
 		/* 폴더 이동 */
 		else if(msg[0] == 'c' && msg[1] == 'd' && msg[2] == ' '){
 			read(client_socket, msg, BUF);
-			if(msg[0] == '-1'){
-				printf("파일이 아니거나 파일명이 잘못됐습니다.\n");
+			if(msg[0] == '0'){
+				printf("folder 아니거나 파일명이 잘못됐습니다.\n");
 			}
 		}
 		/* 파일 실행 */
@@ -98,10 +97,6 @@ int main(int argc,char *argv[]){
 			printf("그런 명령어는 없습니다.\n");
 			continue;
 		}
-
-		/* 서버로 부터 메시지 받음 */
-	//	read(client_socket, msg, BUF);
-	//	printf("client say : i receved [%s]\n",msg);
 	}
 	/* 소켓 종료 */
 	close(client_socket);

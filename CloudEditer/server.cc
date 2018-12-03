@@ -36,7 +36,7 @@ int main(int argc,char *argv[]){
 	char Msgsnd[BUF];
 	vector<string> filename;
 	/* 경로 관련 변수 */
-	char path[BUF];
+	char path[BUF] = "../ClientFolder";
 
 	/* signal을 child가 죽어도 시그널을 무시로 해놓는다. */
 	sigaction(SIGCHLD, &sa, NULL);
@@ -76,10 +76,12 @@ int main(int argc,char *argv[]){
 			exit(1);
 		}
 		/* 클라이언트 디렉토리로 이동 */
-		if((Userdir = opendir("../ClientFolder")) == NULL){
+		chdir(path);
+		if((Userdir = opendir(path)) == NULL){
 			printf("Dir open error\n");
 			exit(0);
 		}
+
 		pid = fork();
 		/* 자식 프로세스이면 메시지를 계속 주고받고 exit오면 종료 */
 		if(pid == 0){
@@ -89,14 +91,16 @@ int main(int argc,char *argv[]){
 				write(client_socket, path, strlen(path)+1);
 				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
+
 				/* 파일 목록 쓰기 */
 				if(!strcmp(Msgrcv,"ls")){
+					Userdir = opendir(path);
 					while((entry = readdir(Userdir)) != NULL){
 						filename.push_back(entry->d_name);
-						write(client_socket, entry->d_name, 10);
+						write(client_socket, entry->d_name, BUF);
 						sleep(0.5);
 					}
-					write(client_socket, "0", 10);
+					write(client_socket, "0", BUF);
 				}
 				/* 폴더 이동 */
 				else if(Msgrcv[0] == 'c' && Msgrcv[1] == 'd' && Msgrcv[2] == ' '){
@@ -114,11 +118,11 @@ int main(int argc,char *argv[]){
 					/* 폴더 or 파일 검사 */
 					lstat(temp,&st);
 					if(S_ISDIR(st.st_mode) && flag){
-					/* Input String Please */
+						write(client_socket, "1", BUF);
+						//path name set -> chdir -> vector clear
 					}
 					else{
-						write(client_socket, "-1", BUF);
-						sleep(0.5);
+						write(client_socket, "0", BUF);
 					}
 				}
 				/* 파일 실행 */
@@ -130,10 +134,6 @@ int main(int argc,char *argv[]){
 					closedir(Userdir);
 					exit(0);
 				}
-
-				/*클라이언트에게 메시지 보내기 */
-	//			sprintf(Msgsnd, "server say : %s", Msgrcv);
-	//			write(client_socket, Msgsnd, strlen(Msgsnd)+1);
 			}
 		}
 		/* 부모 프로세스이면 포크 떠주고 다시 기다림 */
