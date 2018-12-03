@@ -10,6 +10,7 @@
 #include <wait.h>
 #include <signal.h>
 #include <dirent.h>
+#include <sys/stat.h>
 #include <vector>
 using namespace std;
 
@@ -29,6 +30,7 @@ int main(int argc,char *argv[]){
 	/* 디렉토리 관련 변수 */
 	DIR *Userdir;
 	struct dirent* entry = NULL;
+	struct stat st;
 	/* 메시지 관련 변수 */
 	char Msgrcv[BUF];
 	char Msgsnd[BUF];
@@ -98,9 +100,26 @@ int main(int argc,char *argv[]){
 				}
 				/* 폴더 이동 */
 				else if(Msgrcv[0] == 'c' && Msgrcv[1] == 'd' && Msgrcv[2] == ' '){
-					int i = 3, j = 0;
+					int i = 3, j = 0, flag = 0;
 					char temp[BUF];
+					/* 이동할 폴더이름 가져오기 */
 					while(*(temp+(j++)) = *(Msgrcv+(i++)));
+
+					/* 벡터에서 폴더 있는지 없는지 검사 */
+					for(i = 0; i < filename.size(); i++){
+						if(!filename[i].compare(temp)){
+							flag = 1;
+						}
+					}
+					/* 폴더 or 파일 검사 */
+					lstat(temp,&st);
+					if(S_ISDIR(st.st_mode) && flag){
+						//
+					}
+					else{
+						write(client_socket, "-1", BUF);
+						sleep(0.5);
+					}
 				}
 				/* 파일 실행 */
 				else if(Msgrcv[0] == '.' && Msgrcv[1] == '/'){

@@ -80,6 +80,10 @@ int main(int argc,char *argv[]){
 		}
 		/* 폴더 이동 */
 		else if(msg[0] == 'c' && msg[1] == 'd' && msg[2] == ' '){
+			read(client_socket, msg, BUF);
+			if(msg[0] == '-1'){
+				printf("파일이 아니거나 파일명이 잘못됐습니다.\n");
+			}
 		}
 		/* 파일 실행 */
 		else if(msg[0] == '.' && msg[1] == '/'){
