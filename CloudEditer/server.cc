@@ -114,7 +114,7 @@ int main(int argc,char *argv[]){
 					/* 폴더 or 파일 검사 */
 					lstat(temp,&st);
 					if(S_ISDIR(st.st_mode) && flag){
-						//
+						//J 수정필요
 					}
 					else{
 						write(client_socket, "-1", BUF);
