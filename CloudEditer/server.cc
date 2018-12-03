@@ -123,7 +123,30 @@ int main(int argc,char *argv[]){
 				}
 				/* 파일 실행 */
 				else if(Msgrcv[0] == '.' && Msgrcv[1] == '/'){
+					int i = 3, j = 0, flag = 0;
+					char temp[BUF];
+					/* 실행할 폴더이름 가져오기 */
+					while(*(temp+(j++)) = *(Msgrcv+(i++)));
 
+					/* 벡터에서 폴더가 있는지 확인  */
+					for(i = 0; i < filename.size(); i++){
+						if(!filename[i].compare(temp)){
+							flag = 1;
+						}
+					}
+					/* 파일 상태 확인  */
+					if(lstat(temp,&st) == -1){
+						perror("stat");
+						return 1;
+					}
+
+					if(S_ISDIR(st.st_mode)){//디렉토리
+						
+					}else if(S_ISREG(st.st_mode)){//일반파일
+
+					}else{//실행 파일
+
+					}
 				}
 				/* 종료 */
 				else if(!strcmp(Msgrcv, "exit") || !strcmp(Msgrcv, "EXIT")){
