@@ -16,16 +16,13 @@ using namespace std;
 #define BUF 1024
 #define TRUE 1
 
-struct Filelist{
-	vector<string> v;
-};
 int main(int argc,char *argv[]){
 	/* 프로세스 관련 변수 */
 	int pid;
 	/* 소켓 관련 변수 */
 	int server_socket, client_socket, client_addr_size;
 	struct sockaddr_in server_addr, client_addr;
-	/* 헨들러 관련 변수 */
+	/* 시그널 관련 변수 */
 	struct sigaction sa;
 	sa.sa_handler = SIG_IGN;
 	sa.sa_flags = 0;
@@ -35,7 +32,9 @@ int main(int argc,char *argv[]){
 	/* 메시지 관련 변수 */
 	char Msgrcv[BUF];
 	char Msgsnd[BUF];
-	Filelist ls;
+	vector<string> filename;
+	/* 경로 관련 변수 */
+	char path[BUF];
 
 	/* signal을 child가 죽어도 시그널을 무시로 해놓는다. */
 	sigaction(SIGCHLD, &sa, NULL);
@@ -43,7 +42,7 @@ int main(int argc,char *argv[]){
 	/* TCP방식 소켓 생성 */
 	server_socket = socket(AF_INET, SOCK_STREAM, 0);
 	
-	if(-1 == server_socket){
+	if(server_socket == -1){
 		printf("server socket 생성 실패\n");
 		exit(1);
 	}
@@ -54,13 +53,13 @@ int main(int argc,char *argv[]){
 	server_addr.sin_addr.s_addr = htonl(INADDR_ANY);	//32bit IPv4 주소, INADDR_ANY를 사용하면 고정 IP가 아닌 자동 IP
 
 	/* 소켓에 필요한 정보를 할당하고 커널에 등록 */
-	if(-1 == bind(server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr))){
+	if(bind(server_socket, (struct sockaddr *) &server_addr, sizeof(server_addr)) == -1){
 		printf("bind() 실행 에러\n");
 		exit(1);
 	}
 
 	/* bind된 server 소켓으로 클라이언트 접속 요청을 확인하도록 설정, 5명 까지 대기 가능 */
-	if(-1 == listen(server_socket, 5)){
+	if(listen(server_socket, 5) == -1){
 			printf("listen() 실행 실패 \n");
 			exit(1);
 	}
@@ -70,34 +69,43 @@ int main(int argc,char *argv[]){
 		waitpid(pid,NULL,WNOHANG);
 		client_addr_size = sizeof(client_addr);
 		client_socket = accept(server_socket, (sockaddr*)&client_addr, (socklen_t*)&client_addr_size);
-		if( -1 == client_socket){
+		if(client_socket == -1){
 			printf("클라이언트 연결 수락 실패\n");
 			exit(1);
+		}
+		/* 클라이언트 디렉토리로 이동 */
+		if((Userdir = opendir("../ClientFolder")) == NULL){
+			printf("Dir open error\n");
+			exit(0);
 		}
 		pid = fork();
 		/* 자식 프로세스이면 메시지를 계속 주고받고 exit오면 종료 */
 		if(pid == 0){
 			while(TRUE){	
-				/* 클라이언트 디렉토리로 이동 */
-				if((Userdir = opendir("../ClientFolder")) == NULL){
-					printf("Dir open error\n");
-					exit(0);
-				}
+				/* 폴더 경로 보내 주기 */
+				getcwd(path,BUF);
+				write(client_socket, path, strlen(path)+1);
 				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
 				/* 파일 목록 쓰기 */
 				if(!strcmp(Msgrcv,"ls")){
 					while((entry = readdir(Userdir)) != NULL){
-						ls.v.push_back(entry->d_name);
+						filename.push_back(entry->d_name);
 						write(client_socket, entry->d_name, 10);
 						sleep(0.5);
 					}
 					write(client_socket, "0", 10);
 				}
-				/* 파일 실행 */
-				else if(!strcmp(Msgrcv, "파일이름")){
+				/* 폴더 이동 */
+				else if(Msgrcv[0] == 'c' && Msgrcv[1] == 'd' && Msgrcv[2] == ' '){
+					int i = 3, j = 0;
+					char temp[BUF];
+					while(*(temp+(j++)) = *(Msgrcv+(i++)));
 				}
+				/* 파일 실행 */
+				else if(Msgrcv[0] == '.' && Msgrcv[1] == '/'){
 
+				}
 				/* 종료 */
 				else if(!strcmp(Msgrcv, "exit") || !strcmp(Msgrcv, "EXIT")){
 					closedir(Userdir);

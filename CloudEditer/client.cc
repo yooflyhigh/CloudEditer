@@ -12,16 +12,14 @@ using namespace std;
 
 #define BUF 1024
 #define TRUE 1
-struct Filelist{
-	vector<string> v;
-};
 int main(int argc,char *argv[]){
 	/* 소켓 관련 변수 */
 	int client_socket;
 	struct sockaddr_in server_addr;
 	/* 메시지 관련 변수 */
 	char msg[BUF];
-	Filelist ls;
+	/* 경로 관련 변수 */
+	char path[BUF];
 
 	/* 네트워크 통신을 위한  TCP 소켓 생성 */
 	client_socket = socket(AF_INET, SOCK_STREAM, 0);
@@ -44,9 +42,11 @@ int main(int argc,char *argv[]){
 	system("clear");
 	printf("안녕하세요. SP TermProject에 오신걸 환영합니다. \n 'help'를 입력하여 명령어를 확인하세요.\n\n");
 	while(1){
+		read(client_socket, path, BUF);	
 		/* 명령어 입력 */
-		printf("(%d)/home$",getpid());
+		printf("(%d)%s$ ",getpid(),path);
 		cin.getline(msg,1000,'\n');
+
 		/* 서버로 명령어 전송 */
 		write(client_socket, msg, strlen(msg)+1);
 		/* help  */
@@ -56,7 +56,8 @@ int main(int argc,char *argv[]){
 			printf("'whoami' 접속하신 프로세스의 id를 출력합니다.\n");
 			printf("'clear' 화면을 지워줍니다.\n");
 			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
-			printf("'파일이름' 해당 파일을 오픈합니다.\n");
+			printf("'cd [폴더이름]' 해당 폴더로 이동합니다.\n");
+			printf("'./[파일이름]' 해당 파일을 오픈합니다.\n");
 			printf("'exit' 연결을 종료합니다.\n\n");
 		}
 		/* pid 출력 */
@@ -77,9 +78,12 @@ int main(int argc,char *argv[]){
 			}
 			printf("\n");
 		}
+		/* 폴더 이동 */
+		else if(msg[0] == 'c' && msg[1] == 'd' && msg[2] == ' '){
+		}
 		/* 파일 실행 */
-		else if(!strcmp(msg,"파일이름")){
-			printf("구현중 입니다.\n");
+		else if(msg[0] == '.' && msg[1] == '/'){
+			printf("파일 실행\n");
 		}
 		/* 종료 */
 		else if(!strcmp(msg,"exit") || !strcmp(msg,"EXIT")){
