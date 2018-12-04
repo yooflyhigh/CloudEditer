@@ -81,7 +81,7 @@ int main(int argc,char *argv[]){
 		else if(msg[0] == 'c' && msg[1] == 'd' && msg[2] == ' '){
 			read(client_socket, msg, BUF);
 			if(msg[0] == '0'){
-				printf("folder 아니거나 파일명이 잘못됐습니다.\n");
+				printf("폴더가 아니거나 파일명이 잘못됐습니다.\n");
 			}
 			else{
 				continue;
