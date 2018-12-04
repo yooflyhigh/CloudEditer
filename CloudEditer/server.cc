@@ -12,6 +12,7 @@
 #include <dirent.h>
 #include <sys/stat.h>
 #include <vector>
+#include <algorithm>
 using namespace std;
 
 #define BUF 1024
@@ -91,13 +92,17 @@ int main(int argc,char *argv[]){
 				write(client_socket, path, strlen(path)+1);
 				/*클라이언트로 부터 메시지 읽기 */
 				read(client_socket, Msgrcv, BUF);
-
+				Userdir = opendir(path);
+				while((entry = readdir(Userdir)) != NULL){
+					filename.push_back(entry->d_name);
+				}
+				sort(filename.begin(),filename.end());
 				/* 파일 목록 쓰기 */
 				if(!strcmp(Msgrcv,"ls")){
-					Userdir = opendir(path);
-					while((entry = readdir(Userdir)) != NULL){
-						filename.push_back(entry->d_name);
-						write(client_socket, entry->d_name, BUF);
+					for(int i = 0; i < filename.size(); i++){
+						char temp[BUF];
+						strcpy(temp,filename[i].c_str());
+						write(client_socket, temp, BUF);
 						sleep(0.5);
 					}
 					write(client_socket, "0", BUF);
@@ -115,11 +120,13 @@ int main(int argc,char *argv[]){
 							flag = 1;
 						}
 					}
-					/* 폴더 or 파일 검사 */
+					/* 폴더 or 파일 검사, 폴더 이동 */
 					lstat(temp,&st);
 					if(S_ISDIR(st.st_mode) && flag){
 						write(client_socket, "1", BUF);
-						//path name set -> chdir -> vector clear 깃 브랜치 테스트
+						strcpy(path,temp);
+						chdir(path);
+						filename.clear();
 					}
 					else{
 						write(client_socket, "0", BUF);
@@ -157,6 +164,7 @@ int main(int argc,char *argv[]){
 					closedir(Userdir);
 					exit(0);
 				}
+				filename.clear();
 			}
 		}
 		/* 부모 프로세스이면 포크 떠주고 다시 기다림 */
