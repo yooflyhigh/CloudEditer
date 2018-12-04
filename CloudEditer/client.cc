@@ -83,6 +83,9 @@ int main(int argc,char *argv[]){
 			if(msg[0] == '0'){
 				printf("folder 아니거나 파일명이 잘못됐습니다.\n");
 			}
+			else{
+				continue;
+			}
 		}
 		/* 파일 실행 */
 		else if(msg[0] == '.' && msg[1] == '/'){
