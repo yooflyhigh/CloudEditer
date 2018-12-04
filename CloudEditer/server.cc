@@ -116,7 +116,10 @@ int main(int argc,char *argv[]){
 						}
 					}
 					/* 폴더 or 파일 검사 */
-					lstat(temp,&st);
+					if(lstat(temp,&st) == -1){
+						perror("stat");
+						exit(0);
+					}
 					if(S_ISDIR(st.st_mode) && flag){
 						write(client_socket, "1", BUF);
 						//path name set -> chdir -> vector clear
@@ -127,7 +130,7 @@ int main(int argc,char *argv[]){
 				}
 				/* 파일 실행 */
 				else if(Msgrcv[0] == '.' && Msgrcv[1] == '/'){
-					int i = 3, j = 0, flag = 0;
+					int i = 2, j = 0, flag = 0;
 					char temp[BUF];
 					/* 실행할 폴더이름 가져오기 */
 					while(*(temp+(j++)) = *(Msgrcv+(i++)));
@@ -141,14 +144,12 @@ int main(int argc,char *argv[]){
 					/* 파일 상태 확인  */
 					if(lstat(temp,&st) == -1){
 						perror("stat");
-						return 1;
+						exit(0);
 					}
-
-					if(S_ISDIR(st.st_mode)){//디렉토리
-						
-					}else if(S_ISREG(st.st_mode)){//일반파일
-
-					}else{//실행 파일
+					
+					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
+						//툴 실행
+					}else{//다른 파일일 때
 
 					}
 				}
