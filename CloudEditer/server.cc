@@ -119,7 +119,7 @@ int main(int argc,char *argv[]){
 					lstat(temp,&st);
 					if(S_ISDIR(st.st_mode) && flag){
 						write(client_socket, "1", BUF);
-						//path name set -> chdir -> vector clear
+						//path name set -> chdir -> vector clear 깃 브랜치 테스트
 					}
 					else{
 						write(client_socket, "0", BUF);
