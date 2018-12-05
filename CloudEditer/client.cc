@@ -57,6 +57,7 @@ int main(int argc,char *argv[]){
 			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
 			printf("'cd [폴더이름]' 해당 폴더로 이동합니다.\n");
 			printf("'./[파일이름]' 해당 파일을 오픈합니다.\n");
+			printf("'add [폴더이름]' 파일을 생성합니다.\n");
 			printf("'exit' 연결을 종료합니다.\n\n");
 		}
 		/* pid 출력 */
@@ -87,10 +88,22 @@ int main(int argc,char *argv[]){
 				continue;
 			}
 		}
+		/* 파일 생성 */
+		else if(msg[0] == 'a' && msg[1] == 'd' && msg[2] == 'd'){
+			printf("파일 생성\n");
+			read(client_socket, msg, BUF);
+			if(msg[0] == '0'){
+				printf("이름이 같은 파일이 있습니다.");
+			}else{
+				continue;
+			}
+			
+		}
 		/* 파일 실행 */
 		else if(msg[0] == '.' && msg[1] == '/'){
 			printf("파일 실행\n");
 		}
+
 		/* 종료 */
 		else if(!strcmp(msg,"exit") || !strcmp(msg,"EXIT")){
 			close(client_socket);

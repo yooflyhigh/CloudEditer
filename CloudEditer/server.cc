@@ -158,8 +158,31 @@ int main(int argc,char *argv[]){
 					
 					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
 						//툴 실행
+						system("../base");
 					}else{//다른 파일일 때
 
+					}
+				}/* 파일생성  */
+				else if(Msgrcv[0]== 'a'&&Msgrcv[1]== 'd'&&Msgrcv[2]=='d'){
+					int i = 3, j = 0, flag = 0;
+					char temp[BUF];
+					/* 실행할 폴더이름 가져오기 */
+					while(*(temp+(j++)) = *(Msgrcv+(i++)));
+
+					/* 벡터에서 폴더가 있는지 확인 */
+					for(i = 0; i < filename.size(); i++){
+						if(!filename[i].compare(temp)){
+							flag = 1;
+						}
+					}
+					/* 파일 생성 */
+					if(flag){
+						char arr[BUF];
+						sprintf(arr,"cp base ../ClientFolder/%s",temp);
+						system(arr);
+						printf("12");
+					}else{
+						write(client_socket, "0", BUF);
 					}
 				}
 				/* 종료 */
