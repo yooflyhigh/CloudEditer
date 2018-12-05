@@ -163,8 +163,8 @@ int main(int argc,char *argv[]){
 
 					}
 				}/* 파일생성  */
-				else if(Msgrcv[0]== 'a'&&Msgrcv[1]== 'd'&&Msgrcv[2]=='d'){
-					int i = 3, j = 0, flag = 0;
+				else if(Msgrcv[0]== 'a'&&Msgrcv[1]== 'd'&&Msgrcv[2]=='d'&&Msgrcv[3] == ' '){
+					int i = 4, j = 0, flag = 0;
 					char temp[BUF];
 					/* 실행할 폴더이름 가져오기 */
 					while(*(temp+(j++)) = *(Msgrcv+(i++)));
@@ -176,11 +176,11 @@ int main(int argc,char *argv[]){
 						}
 					}
 					/* 파일 생성 */
-					if(flag){
+					if(!flag){
+						write(client_socket,"1",BUF);
 						char arr[BUF];
-						sprintf(arr,"cp base ../ClientFolder/%s",temp);
+						sprintf(arr,"cp ../base ../ClientFolder/%s",temp);
 						system(arr);
-						printf("12");
 					}else{
 						write(client_socket, "0", BUF);
 					}

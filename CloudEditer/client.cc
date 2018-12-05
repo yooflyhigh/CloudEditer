@@ -89,9 +89,10 @@ int main(int argc,char *argv[]){
 			}
 		}
 		/* 파일 생성 */
-		else if(msg[0] == 'a' && msg[1] == 'd' && msg[2] == 'd'){
+		else if(msg[0] == 'a' && msg[1] == 'd' && msg[2] == 'd' && msg[3] == ' '){
 			printf("파일 생성\n");
 			read(client_socket, msg, BUF);
+
 			if(msg[0] == '0'){
 				printf("이름이 같은 파일이 있습니다.");
 			}else{
