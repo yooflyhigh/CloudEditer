@@ -1,7 +1,7 @@
 CFLAGS+=-Wall -Wextra
 CFLAGS+=`pkg-config --cflags gtk+-2.0`
 LIBS+=`pkg-config --libs gtk+-2.0`
-PROG=gtk-notepad
+PROG=notepad
 
 help:
 	@echo -e "Available commands:"
@@ -10,7 +10,7 @@ help:
 	@echo -e "\thelp - print this help message"
 
 all:
-	$(CC) $(CFLAGS) -o $(PROG) src/*.c $(LIBS)
+	$(CC) $(CFLAGS) -o $(PROG) *.c $(LIBS)
 
 clean:
 	rm -f $(PROG)

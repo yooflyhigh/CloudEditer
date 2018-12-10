@@ -158,10 +158,11 @@ int main(int argc,char *argv[]){
 					
 					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
 						//툴 실행
-						system("../base");
-					}else{//다른 파일일 때
-
+						char arr[BUF];
+						sprintf(arr,"%s/%s",path,temp);
+						system(arr);
 					}
+
 				}/* 파일생성  */
 				else if(Msgrcv[0]== 'a'&&Msgrcv[1]== 'd'&&Msgrcv[2]=='d'&&Msgrcv[3] == ' '){
 					int i = 4, j = 0, flag = 0;
@@ -179,7 +180,7 @@ int main(int argc,char *argv[]){
 					if(!flag){
 						write(client_socket,"1",BUF);
 						char arr[BUF];
-						sprintf(arr,"cp ../base ../ClientFolder/%s",temp);
+						sprintf(arr,"cp /home/yoo/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);
 						system(arr);
 					}else{
 						write(client_socket, "0", BUF);
