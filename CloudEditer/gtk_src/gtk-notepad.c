@@ -3,51 +3,25 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include "gtk-notepad.h"
 
 char file_name[1024];
-int save_size;
-int update_size;
-int dirtybit;
-struct tm *my_time;
-
+int Dirty_Bit;
 
 static gboolean
 key_event(G_GNUC_UNUSED GtkWidget *widget,
           GdkEventKey *event)
 {
-	dirtybit = 1;
-    g_printerr("%s: keyval=%04x state=0x%04x\n",
-               event->type == GDK_KEY_PRESS ? "press" : "release",
-               event->keyval, event->state);
+	Dirty_Bit = 1;
     return FALSE;
 }
 			
 
 void alarm_handler(){
-	struct stat buf;
-	struct tm *t;
-	if(dirtybit == 1){
-		stat(file_name,&buf);
-		t = localtime(&buf.st_ctime);
-		printf("before\n");
+	if(Dirty_Bit){
 		gtk_notepad_save();
-		printf("after\n");
-	//	printf("t : %d, my time : %d\n",t->tmec , my_time->tm_sec);
 		gtk_notepad_open_file(file_name);
-/*		if(save_size != update_size && t->tm_sec != my_time->tm_sec){
-			printf("updated !! \n");
-		}*/
-		/*
-		printf("t sec : %d, mt sec : %d\n",t->tm_sec, my_time->tm_sec);
-		if(save_size != update_size && t->tm_sec != my_time->tm_sec){
-			gtk_notepad_open_file(file_name);
-			printf("changed !! \n");
-		}
-		gtk_notepad_save();
-		*/
-	dirtybit = 0;
+		Dirty_Bit = 0;
 	}
 	else{
 		gtk_notepad_open_file(file_name);
@@ -277,12 +251,7 @@ char gtk_notepad_open_file(const char* filename) {
         buf = malloc(fsize + 1);
         fread(buf, fsize, 1, fp);
         buf[fsize] = '\0';
-/*
-		  struct stat buff;
-		  stat(file_name,&buff);
-		  my_time = localtime(&buff.st_atime);
-*/
-		  update_size = strlen(buf);
+
         gtk_text_buffer_set_text(buffer, buf, -1);
 
         free(buf);
@@ -352,7 +321,6 @@ void gtk_notepad_open(void) {
 /* Save the file (actually) */
 char gtk_notepad_save_file(const char* filename) {
     FILE *fp = fopen(filename, "wb");
-	 struct stat buff;
     if (!fp) {
         fprintf(stderr, "%s: fopen(null): %s\n",
                 PROGNAME,
@@ -371,12 +339,6 @@ char gtk_notepad_save_file(const char* filename) {
                                              TRUE);
 
         fwrite(buf, strlen(buf), 1, fp);
-		 /* if(strlen(buf) != save_size){
-		  	  save_size = strlen(buf);
-			  stat(file_name,&buff);
-			  my_time = localtime(&buff.st_mtime);
-			  printf("saved\n");
-		  }*/
         free(buf);
         fclose(fp);
 
@@ -631,7 +593,7 @@ int main(int argc, char* argv[]) {
     // We don't want errors on the first `free()'
     loaded_fn = malloc(1);
     loaded_fn[0] = '\0';
-	 dirtybit = 0;
+	 Dirty_Bit = 0;
 
     if (argc == 2) {
         FILE *temp = fopen(argv[1], "rb");

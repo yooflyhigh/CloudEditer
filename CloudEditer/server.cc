@@ -123,7 +123,6 @@ int main(int argc,char *argv[]){
 					/* 폴더 or 파일 검사 */
 					if(lstat(temp,&st) == -1){
 						perror("stat");
-						exit(0);
 					}
 					/* 폴더 or 파일 검사, 폴더 이동 */
 					lstat(temp,&st);
@@ -153,9 +152,7 @@ int main(int argc,char *argv[]){
 					/* 파일 상태 확인  */
 					if(lstat(temp,&st) == -1){
 						perror("stat");
-						exit(0);
 					}
-					
 					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
 						//툴 실행
 						char arr[BUF];
@@ -182,7 +179,8 @@ int main(int argc,char *argv[]){
 						char arr[BUF];
 						sprintf(arr,"cp /home/yoo/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);
 						system(arr);
-					}else{
+					}
+					else{
 						write(client_socket, "0", BUF);
 					}
 				}

@@ -56,8 +56,8 @@ int main(int argc,char *argv[]){
 			printf("'clear' 화면을 지워줍니다.\n");
 			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
 			printf("'cd [폴더이름]' 해당 폴더로 이동합니다.\n");
+			printf("'add [vkdlf이름]' 파일을 생성합니다.\n");
 			printf("'./[파일이름]' 해당 파일을 오픈합니다.\n");
-			printf("'add [폴더이름]' 파일을 생성합니다.\n");
 			printf("'exit' 연결을 종료합니다.\n\n");
 		}
 		/* pid 출력 */
@@ -94,8 +94,9 @@ int main(int argc,char *argv[]){
 			read(client_socket, msg, BUF);
 
 			if(msg[0] == '0'){
-				printf("이름이 같은 파일이 있습니다.");
-			}else{
+				printf("이름이 같은 파일이 있습니다.\n");
+			}
+			else{
 				continue;
 			}
 			
