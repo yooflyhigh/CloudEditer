@@ -9,27 +9,52 @@
 char file_name[1024];
 int save_size;
 int update_size;
+int dirtybit;
 struct tm *my_time;
+
+
+static gboolean
+key_event(G_GNUC_UNUSED GtkWidget *widget,
+          GdkEventKey *event)
+{
+	dirtybit = 1;
+    g_printerr("%s: keyval=%04x state=0x%04x\n",
+               event->type == GDK_KEY_PRESS ? "press" : "release",
+               event->keyval, event->state);
+    return FALSE;
+}
+			
+
 void alarm_handler(){
 	struct stat buf;
 	struct tm *t;
-	stat(file_name,&buf);
-	t = localtime(&buf.st_mtime);
-	if(save_size != update_size && t->tm_sec == my_time->tm_sec){
+	if(dirtybit == 1){
+		stat(file_name,&buf);
+		t = localtime(&buf.st_ctime);
+		printf("before\n");
+		gtk_notepad_save();
+		printf("after\n");
+	//	printf("t : %d, my time : %d\n",t->tmec , my_time->tm_sec);
 		gtk_notepad_open_file(file_name);
-		printf("updated !! \n");
+/*		if(save_size != update_size && t->tm_sec != my_time->tm_sec){
+			printf("updated !! \n");
+		}*/
+		/*
+		printf("t sec : %d, mt sec : %d\n",t->tm_sec, my_time->tm_sec);
+		if(save_size != update_size && t->tm_sec != my_time->tm_sec){
+			gtk_notepad_open_file(file_name);
+			printf("changed !! \n");
+		}
+		gtk_notepad_save();
+		*/
+	dirtybit = 0;
 	}
- 	gtk_notepad_save();
-	/*
-	printf("t sec : %d, mt sec : %d\n",t->tm_sec, my_time->tm_sec);
-	if(save_size != update_size && t->tm_sec != my_time->tm_sec){
+	else{
 		gtk_notepad_open_file(file_name);
-		printf("changed !! \n");
 	}
- 	gtk_notepad_save();
-	*/
 	alarm(1);
 }
+
 
 void print_usage(void) {
     fprintf(stderr, "%s: usage: %s [file]\n",
@@ -252,11 +277,11 @@ char gtk_notepad_open_file(const char* filename) {
         buf = malloc(fsize + 1);
         fread(buf, fsize, 1, fp);
         buf[fsize] = '\0';
-
+/*
 		  struct stat buff;
 		  stat(file_name,&buff);
 		  my_time = localtime(&buff.st_atime);
-
+*/
 		  update_size = strlen(buf);
         gtk_text_buffer_set_text(buffer, buf, -1);
 
@@ -345,13 +370,13 @@ char gtk_notepad_save_file(const char* filename) {
                                              &end,
                                              TRUE);
 
-		  if(strlen(buf) != save_size){
+        fwrite(buf, strlen(buf), 1, fp);
+		 /* if(strlen(buf) != save_size){
 		  	  save_size = strlen(buf);
-        	  fwrite(buf, strlen(buf), 1, fp);
 			  stat(file_name,&buff);
 			  my_time = localtime(&buff.st_mtime);
 			  printf("saved\n");
-		  }
+		  }*/
         free(buf);
         fclose(fp);
 
@@ -606,6 +631,7 @@ int main(int argc, char* argv[]) {
     // We don't want errors on the first `free()'
     loaded_fn = malloc(1);
     loaded_fn[0] = '\0';
+	 dirtybit = 0;
 
     if (argc == 2) {
         FILE *temp = fopen(argv[1], "rb");
@@ -651,6 +677,7 @@ int main(int argc, char* argv[]) {
     setup_menubar();
     setup_textarea();
     setup_statusbar();
+	 g_signal_connect(gwindow, "key-release-event",G_CALLBACK(key_event),NULL);
 
     if (argc == 2){
 		  signal(SIGALRM,alarm_handler);
