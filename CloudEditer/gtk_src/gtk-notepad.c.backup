@@ -3,33 +3,8 @@
 #include <errno.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/stat.h>
 #include "gtk-notepad.h"
 
-char file_name[1024];
-int save_size;
-int update_size;
-struct tm *my_time;
-void alarm_handler(){
-	struct stat buf;
-	struct tm *t;
-	stat(file_name,&buf);
-	t = localtime(&buf.st_mtime);
-	if(save_size != update_size && t->tm_sec == my_time->tm_sec){
-		gtk_notepad_open_file(file_name);
-		printf("updated !! \n");
-	}
- 	gtk_notepad_save();
-	/*
-	printf("t sec : %d, mt sec : %d\n",t->tm_sec, my_time->tm_sec);
-	if(save_size != update_size && t->tm_sec != my_time->tm_sec){
-		gtk_notepad_open_file(file_name);
-		printf("changed !! \n");
-	}
- 	gtk_notepad_save();
-	*/
-	alarm(1);
-}
 
 void print_usage(void) {
     fprintf(stderr, "%s: usage: %s [file]\n",
@@ -249,15 +224,11 @@ char gtk_notepad_open_file(const char* filename) {
         fseek(fp, 0, SEEK_END);
         long fsize = ftell(fp);
         fseek(fp, 0, SEEK_SET);
+
         buf = malloc(fsize + 1);
         fread(buf, fsize, 1, fp);
         buf[fsize] = '\0';
 
-		  struct stat buff;
-		  stat(file_name,&buff);
-		  my_time = localtime(&buff.st_atime);
-
-		  update_size = strlen(buf);
         gtk_text_buffer_set_text(buffer, buf, -1);
 
         free(buf);
@@ -327,7 +298,6 @@ void gtk_notepad_open(void) {
 /* Save the file (actually) */
 char gtk_notepad_save_file(const char* filename) {
     FILE *fp = fopen(filename, "wb");
-	 struct stat buff;
     if (!fp) {
         fprintf(stderr, "%s: fopen(null): %s\n",
                 PROGNAME,
@@ -345,13 +315,7 @@ char gtk_notepad_save_file(const char* filename) {
                                              &end,
                                              TRUE);
 
-		  if(strlen(buf) != save_size){
-		  	  save_size = strlen(buf);
-        	  fwrite(buf, strlen(buf), 1, fp);
-			  stat(file_name,&buff);
-			  my_time = localtime(&buff.st_mtime);
-			  printf("saved\n");
-		  }
+        fwrite(buf, strlen(buf), 1, fp);
         free(buf);
         fclose(fp);
 
@@ -622,7 +586,6 @@ int main(int argc, char* argv[]) {
         free(loaded_fn);
         loaded_fn = malloc(strlen(argv[1]));
         strcpy(loaded_fn, argv[1]);
-		  strcpy(file_name,loaded_fn);
     }
     else if (argc > 2) {
         print_usage();
@@ -652,11 +615,9 @@ int main(int argc, char* argv[]) {
     setup_textarea();
     setup_statusbar();
 
-    if (argc == 2){
-		  signal(SIGALRM,alarm_handler);
-		  alarm(1);
+    if (argc == 2)
         gtk_notepad_open_file(loaded_fn);
-	 }
+
     g_signal_connect(window, "destroy",
                      (GCallback) gtk_main_quit, NULL);
     gtk_widget_show_all(window);
