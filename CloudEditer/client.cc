@@ -101,6 +101,17 @@ int main(int argc,char *argv[]){
 			}
 			
 		}
+		/* 파일 삭제 */
+		else if(msg[0] == 'r' && msg[1] == 'm' && msg[2] == ' '){
+			printf("파일 삭제\n");
+			read(client_socket, msg, BUF);
+
+			if(msg [0] == '0'){
+				printf("이름이 같은 파일이 없습니다.");
+			}else{
+				continue;
+			}
+		}
 		/* 파일 실행 */
 		else if(msg[0] == '.' && msg[1] == '/'){
 			printf("파일 실행\n");
