@@ -57,6 +57,7 @@ int main(int argc,char *argv[]){
 			printf("'ls' 서버의 공유 파일을 읽어옵니다.\n");
 			printf("'cd [폴더이름]' 해당 폴더로 이동합니다.\n");
 			printf("'add [이름]' 파일을 생성합니다.\n");
+			printf("'rm [이름]' 파일을 삭제합니다\n'");
 			printf("'./[파일이름]' 해당 파일을 오픈합니다.\n");
 			printf("'exit' 연결을 종료합니다.\n\n");
 		}
