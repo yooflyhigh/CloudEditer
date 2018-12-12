@@ -156,7 +156,7 @@ int main(int argc,char *argv[]){
 					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
 						//툴 실행
 						char arr[BUF];
-						sprintf(arr,"cp /home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);	
+						sprintf(arr,"/home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/Original_Data %s/%s",path,temp);	
 						system(arr);
 					}
 
