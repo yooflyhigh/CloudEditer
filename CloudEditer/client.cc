@@ -108,7 +108,7 @@ int main(int argc,char *argv[]){
 			read(client_socket, msg, BUF);
 
 			if(msg [0] == '0'){
-				printf("이름이 같은 파일이 없습니다.");
+				printf("이름이 같은 파일이 없습니다.\n");
 			}else{
 				continue;
 			}

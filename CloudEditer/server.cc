@@ -156,7 +156,8 @@ int main(int argc,char *argv[]){
 					if(S_ISREG(st.st_mode) && flag){//일반파일 & 실행파일
 						//툴 실행
 						char arr[BUF];
-						sprintf(arr,"/home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/Original_Data %s/%s",path,temp);	
+					//	sprintf(arr,"/home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/Original_Data %s/%s",path,temp);	
+						sprintf(arr,"/home/yoo/SP2018F/CloudEditer/CloudEditer/Original_Data %s/%s",path,temp);	
 						system(arr);
 					}
 
@@ -177,8 +178,8 @@ int main(int argc,char *argv[]){
 					if(!flag){
 						write(client_socket,"1",BUF);
 						char arr[BUF];
-						//sprintf(arr,"cp /home/yoo/HOME_DIR/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);	
-						sprintf(arr,"cp /home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);	
+						sprintf(arr,"cp /home/yoo/SP2018F/CloudEditer/CloudEditer/note %s/%s",path,temp);	
+					//	sprintf(arr,"cp /home/jgm/HOME_DIR/SP2018F/CloudEditer/CloudEditer/notepad %s/%s",path,temp);	
 						system(arr);
 					}
 					else{
